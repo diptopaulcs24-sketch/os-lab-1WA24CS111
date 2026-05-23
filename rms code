@@ -1,0 +1,55 @@
+#include <stdio.h>
+
+int main()
+{
+    int n, hyper = 1;
+
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    int burst[n], period[n], rem[n];
+
+    printf("Enter Burst Time and Period for each process:\n");
+    for(int i = 0; i < n; i++)
+    {
+        scanf("%d %d", &burst[i], &period[i]);
+        rem[i] = burst[i];
+
+        if(period[i] > hyper)
+            hyper *= period[i];
+    }
+
+    printf("\nExecution Order:\n");
+
+    for(int t = 0; t < hyper; t++)
+    {
+        for(int i = 0; i < n; i++)
+        {
+            if(t % period[i] == 0)
+                rem[i] = burst[i];
+        }
+
+        int selected = -1;
+
+        for(int i = 0; i < n; i++)
+        {
+            if(rem[i] > 0)
+            {
+                if(selected == -1 || period[i] < period[selected])
+                    selected = i;
+            }
+        }
+
+        if(selected != -1)
+        {
+            printf("Time %d -> P%d\n", t, selected + 1);
+            rem[selected]--;
+        }
+        else
+        {
+            printf("Time %d -> Idle\n", t);
+        }
+    }
+
+    return 0;
+}
