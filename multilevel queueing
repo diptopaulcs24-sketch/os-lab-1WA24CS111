@@ -1,0 +1,105 @@
+#include <stdio.h>
+
+int main()
+{
+    int n1, n2, tq;
+
+    printf("Enter number of processes in Queue 1: ");
+    scanf("%d", &n1);
+
+    int bt1[n1], rt1[n1], wt1[n1], tat1[n1];
+
+    printf("Enter burst times for Queue 1:\n");
+    for(int i = 0; i < n1; i++)
+    {
+        scanf("%d", &bt1[i]);
+        rt1[i] = bt1[i];
+    }
+
+    printf("Enter Time Quantum for Queue 1: ");
+    scanf("%d", &tq);
+
+    printf("Enter number of processes in Queue 2: ");
+    scanf("%d", &n2);
+
+    int bt2[n2], wt2[n2], tat2[n2];
+
+    printf("Enter burst times for Queue 2:\n");
+    for(int i = 0; i < n2; i++)
+        scanf("%d", &bt2[i]);
+
+    int time = 0;
+
+    for(int i = 0; i < n1; i++)
+        wt1[i] = 0;
+
+    int done;
+
+    do
+    {
+        done = 1;
+
+        for(int i = 0; i < n1; i++)
+        {
+            if(rt1[i] > 0)
+            {
+                done = 0;
+
+                if(rt1[i] > tq)
+                {
+                    time += tq;
+                    rt1[i] -= tq;
+                }
+                else
+                {
+                    time += rt1[i];
+                    wt1[i] = time - bt1[i];
+                    rt1[i] = 0;
+                }
+            }
+        }
+    } while(!done);
+
+    int start = time;
+
+    for(int i = 0; i < n2; i++)
+    {
+        wt2[i] = start;
+        for(int j = 0; j < i; j++)
+            wt2[i] += bt2[j];
+
+        tat2[i] = wt2[i] + bt2[i];
+    }
+
+    float avg_wt = 0, avg_tat = 0;
+
+    printf("\nQueue 1 (Round Robin)\n");
+    printf("Process\tBT\tWT\tTAT\n");
+
+    for(int i = 0; i < n1; i++)
+    {
+        tat1[i] = bt1[i] + wt1[i];
+        avg_wt += wt1[i];
+        avg_tat += tat1[i];
+
+        printf("P%d\t%d\t%d\t%d\n", i + 1, bt1[i], wt1[i], tat1[i]);
+    }
+
+    printf("\nQueue 2 (FCFS)\n");
+    printf("Process\tBT\tWT\tTAT\n");
+
+    for(int i = 0; i < n2; i++)
+    {
+        avg_wt += wt2[i];
+        avg_tat += tat2[i];
+
+        printf("P%d\t%d\t%d\t%d\n", n1 + i + 1, bt2[i], wt2[i], tat2[i]);
+    }
+
+    int total = n1 + n2;
+
+    printf("\nAverage Waiting Time = %.2f", avg_wt / total);
+    printf("\nAverage Turnaround Time = %.2f\n", avg_tat / total);
+
+    return 0;
+}
